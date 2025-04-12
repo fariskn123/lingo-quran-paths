@@ -19,7 +19,7 @@ const QuranicPathPage = () => {
   
   const handleLevelClick = (levelId: string) => {
     if (userState.unlockedLevels.includes(levelId)) {
-      navigate(`/level/${levelId}`);
+      navigate(`/path/${levelId}`);
     }
   };
   

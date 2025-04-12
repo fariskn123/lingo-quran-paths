@@ -1,15 +1,16 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Award, Home, RotateCcw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
+import confetti from 'canvas-confetti';
 import { useUser } from '@/contexts/UserContext';
 import levelsData from '@/data/levelsData';
 
 const VictoryScreen = () => {
   const { lessonId } = useParams<{ lessonId: string }>();
   const navigate = useNavigate();
-  const { userState } = useUser();
+  const { userState, completeLesson } = useUser();
+  const [xpEarned, setXpEarned] = useState(0);
   
   // Find the lesson and its parent level
   const level = levelsData.find(level => 
@@ -18,109 +19,105 @@ const VictoryScreen = () => {
   
   const lesson = level?.lessons.find(lesson => lesson.id === lessonId);
   
-  if (!lesson || !level) {
-    navigate('/levels');
-    return null;
-  }
-  
-  // Find next lesson
-  const levelLessons = level.lessons;
-  const currentLessonIndex = levelLessons.findIndex(l => l.id === lessonId);
-  const nextLesson = levelLessons[currentLessonIndex + 1];
-  
-  // Find next level if this was the last lesson
-  const levelIndex = levelsData.findIndex(l => l.id === level.id);
-  const nextLevel = !nextLesson && levelIndex < levelsData.length - 1 
-    ? levelsData[levelIndex + 1] 
-    : null;
-  const isNextLevelUnlocked = nextLevel 
-    ? userState.unlockedLevels.includes(nextLevel.id)
-    : false;
-  
-  // Confetti effect
   useEffect(() => {
-    // This would be implemented with a confetti library in a real app
-    console.log('Showing victory confetti!');
+    if (lesson && !userState.completedLessons.includes(lesson.id)) {
+      // Mark lesson as completed and add XP
+      completeLesson(lesson.id);
+      setXpEarned(lesson.xpReward);
+      
+      // Trigger confetti
+      console.log('Showing victory confetti!');
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
     
     return () => {
       console.log('Cleaning up confetti');
     };
-  }, []);
+  }, [lesson, completeLesson, userState.completedLessons]);
   
-  const handleNextLesson = () => {
-    if (nextLesson) {
-      navigate(`/lesson/${nextLesson.id}`);
-    } else if (nextLevel && isNextLevelUnlocked) {
-      navigate(`/level/${nextLevel.id}`);
+  const handleContinue = () => {
+    if (level) {
+      // Navigate back to the SubLessonPathPage instead of QuranicPathPage
+      navigate(`/path/${level.id}`);
     } else {
-      navigate('/levels');
+      navigate('/');
     }
   };
   
-  return (
-    <div className="min-h-screen bg-quran-background flex flex-col items-center justify-center p-4">
-      <div className="max-w-md w-full text-center">
-        <div className="animate-bounce-subtle mb-8">
-          <Award className="w-24 h-24 mx-auto text-quran-gold" />
-        </div>
-        
-        <h1 className="text-3xl font-bold mb-2">Excellent!</h1>
-        <h2 className="text-xl text-gray-700 mb-8">You completed "{lesson.title}"</h2>
-        
-        <div className="bg-white rounded-xl p-6 mb-8 shadow-md">
-          <div className="flex items-center justify-center gap-4 mb-4">
-            <div className="bg-quran-gold rounded-full w-12 h-12 flex items-center justify-center">
-              <span className="text-white font-bold">+{lesson.xpReward}</span>
-            </div>
-            <div className="text-left">
-              <div className="font-bold">XP Earned</div>
-              <div className="text-sm text-gray-600">Total: {userState.xp} XP</div>
-            </div>
-          </div>
-          
-          <div className="text-sm text-gray-600 mb-2">
-            You've mastered {lesson.words.length} new words!
-          </div>
-          
-          {nextLevel && !isNextLevelUnlocked && (
-            <div className="bg-yellow-50 p-3 rounded-lg text-yellow-800 text-sm">
-              Keep learning to unlock {nextLevel.name} ({nextLevel.xpRequired - userState.xp} XP needed)
-            </div>
-          )}
-        </div>
-        
-        <div className="grid grid-cols-1 gap-3">
-          {(nextLesson || (nextLevel && isNextLevelUnlocked)) && (
-            <Button 
-              className="btn-primary"
-              onClick={handleNextLesson}
-            >
-              {nextLesson 
-                ? 'Next Lesson' 
-                : `Start ${nextLevel?.name}`
-              }
-            </Button>
-          )}
-          
-          <Button 
-            variant="outline"
-            className="flex items-center justify-center gap-2"
-            onClick={() => navigate('/levels')}
+  if (!lesson || !level) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Lesson not found</h1>
+          <button 
+            className="btn-primary"
+            onClick={() => navigate('/')}
           >
-            <Home className="w-4 h-4" />
-            Lesson Path
-          </Button>
-          
-          <Button 
-            variant="outline"
-            className="flex items-center justify-center gap-2"
-            onClick={() => navigate(`/lesson/${lessonId}`)}
-          >
-            <RotateCcw className="w-4 h-4" />
-            Review Lesson
-          </Button>
+            Return to Path
+          </button>
         </div>
       </div>
+    );
+  }
+  
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      <motion.div 
+        className="w-full max-w-md bg-white rounded-3xl shadow-lg p-8 text-center"
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <motion.div
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+          className="mb-6"
+        >
+          <span className="text-6xl">🎉</span>
+        </motion.div>
+        
+        <h1 className="text-3xl font-bold mb-2">Victory!</h1>
+        <p className="text-gray-600 mb-6">
+          You've completed "{lesson.title}"
+        </p>
+        
+        <div className="bg-muted rounded-lg p-4 mb-8">
+          <motion.div 
+            className="text-xl font-bold mb-1 text-quran-gold"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+          >
+            +{xpEarned} XP Earned
+          </motion.div>
+          
+          <motion.div
+            className="text-gray-600"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.7, duration: 0.5 }}
+          >
+            You now have {userState.xp} XP total
+          </motion.div>
+        </div>
+        
+        <motion.button
+          className="btn-primary w-full"
+          onClick={handleContinue}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.9, duration: 0.5 }}
+        >
+          Continue
+        </motion.button>
+      </motion.div>
     </div>
   );
 };

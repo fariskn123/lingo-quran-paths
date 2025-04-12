@@ -9,6 +9,7 @@ import { useEffect } from "react";
 
 // Pages
 import QuranicPathPage from "./pages/QuranicPathPage";
+import SubLessonPathPage from "./pages/SubLessonPathPage";
 import LevelsPage from "./pages/LevelsPage";
 import LevelDetailPage from "./pages/LevelDetailPage";
 import LessonPage from "./pages/LessonPage";
@@ -45,6 +46,7 @@ const App = () => {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<QuranicPathPage />} />
+              <Route path="/path/:unitId" element={<SubLessonPathPage />} />
               <Route path="/levels" element={<LevelsPage />} />
               <Route path="/level/:levelId" element={<LevelDetailPage />} />
               <Route path="/lesson/:lessonId" element={<LessonPage />} />

@@ -43,7 +43,7 @@ const LessonPage = () => {
         <div className="flex justify-between items-center mb-6">
           <button 
             className="flex items-center text-quran-green font-medium"
-            onClick={() => navigate(`/level/${level.id}`)}
+            onClick={() => navigate(`/path/${level.id}`)}
           >
             <ArrowLeft className="w-5 h-5 mr-1" />
             Back
