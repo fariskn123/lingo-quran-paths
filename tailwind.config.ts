@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,16 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+        // Qur'ānLingo custom colors
+        "quran-green": "#25A69A",
+        "level-1": "#4CAF50",
+        "level-2": "#FFD54F",
+        "level-3": "#FF9800",
+        "level-4": "#2196F3",
+        "level-5": "#9C27B0",
+        "quran-background": "#FEF7E4",
+        "quran-gold": "#FFC107",
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,11 +94,32 @@ export default {
 					to: {
 						height: '0'
 					}
-				}
+				},
+        // Custom animations
+        'bounce-subtle': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-5px)' }
+        },
+        'scale-in': {
+          '0%': { transform: 'scale(0.95)', opacity: '0' },
+          '100%': { transform: 'scale(1)', opacity: '1' }
+        },
+        'slide-up': {
+          '0%': { transform: 'translateY(10px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' }
+        },
+        'pulse-glow': {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.7' }
+        }
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+        'bounce-subtle': 'bounce-subtle 2s ease-in-out infinite',
+        'scale-in': 'scale-in 0.2s ease-out',
+        'slide-up': 'slide-up 0.3s ease-out',
+        'pulse-glow': 'pulse-glow 2s ease-in-out infinite'
 			}
 		}
 	},
