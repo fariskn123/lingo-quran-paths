@@ -13,6 +13,7 @@ import SubLessonPathPage from "./pages/SubLessonPathPage";
 import LevelsPage from "./pages/LevelsPage";
 import LevelDetailPage from "./pages/LevelDetailPage";
 import LessonPage from "./pages/LessonPage";
+import SubLessonDetailPage from "./pages/SubLessonDetailPage";
 import FlashcardLessonPage from "./pages/FlashcardLessonPage";
 import QuizPage from "./pages/QuizPage";
 import ChallengeTranslationPage from "./pages/ChallengeTranslationPage";
@@ -47,6 +48,7 @@ const App = () => {
             <Routes>
               <Route path="/" element={<QuranicPathPage />} />
               <Route path="/path/:unitId" element={<SubLessonPathPage />} />
+              <Route path="/path/:unitId/lesson/:lessonId" element={<SubLessonDetailPage />} />
               <Route path="/levels" element={<LevelsPage />} />
               <Route path="/level/:levelId" element={<LevelDetailPage />} />
               <Route path="/lesson/:lessonId" element={<LessonPage />} />
