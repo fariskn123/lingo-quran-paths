@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider } from "./contexts/UserContext";
+import { useEffect } from "react";
 
 // Pages
 import HomePage from "./pages/HomePage";
@@ -20,29 +21,45 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <UserProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/levels" element={<LevelsPage />} />
-            <Route path="/level/:levelId" element={<LevelDetailPage />} />
-            <Route path="/lesson/:lessonId" element={<LessonPage />} />
-            <Route path="/flashcards/:lessonId" element={<FlashcardLessonPage />} />
-            <Route path="/quiz/:lessonId" element={<QuizPage />} />
-            <Route path="/challenge/:lessonId" element={<ChallengeTranslationPage />} />
-            <Route path="/victory/:lessonId" element={<VictoryScreen />} />
-            <Route path="/review" element={<ReviewPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </UserProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  // Dynamically load the Arabic font
+  useEffect(() => {
+    // Create link element for Google Font
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap';
+    document.head.appendChild(link);
+    
+    return () => {
+      // Clean up when component unmounts
+      document.head.removeChild(link);
+    };
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <UserProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/levels" element={<LevelsPage />} />
+              <Route path="/level/:levelId" element={<LevelDetailPage />} />
+              <Route path="/lesson/:lessonId" element={<LessonPage />} />
+              <Route path="/flashcards/:lessonId" element={<FlashcardLessonPage />} />
+              <Route path="/quiz/:lessonId" element={<QuizPage />} />
+              <Route path="/challenge/:lessonId" element={<ChallengeTranslationPage />} />
+              <Route path="/victory/:lessonId" element={<VictoryScreen />} />
+              <Route path="/review" element={<ReviewPage />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </UserProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
