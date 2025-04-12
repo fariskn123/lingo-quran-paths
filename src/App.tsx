@@ -3,12 +3,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { UserProvider } from "./contexts/UserContext";
 import { useEffect } from "react";
 
 // Pages
-import HomePage from "./pages/HomePage";
+import QuranicPathPage from "./pages/QuranicPathPage";
 import LevelsPage from "./pages/LevelsPage";
 import LevelDetailPage from "./pages/LevelDetailPage";
 import LessonPage from "./pages/LessonPage";
@@ -44,7 +44,7 @@ const App = () => {
           <Sonner />
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<HomePage />} />
+              <Route path="/" element={<QuranicPathPage />} />
               <Route path="/levels" element={<LevelsPage />} />
               <Route path="/level/:levelId" element={<LevelDetailPage />} />
               <Route path="/lesson/:lessonId" element={<LessonPage />} />
