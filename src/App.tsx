@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,6 +18,7 @@ import FlashcardLessonPage from "./pages/FlashcardLessonPage";
 import QuizPage from "./pages/QuizPage";
 import ChallengeQuizPage from "./pages/ChallengeQuizPage";
 import ChallengeTranslationPage from "./pages/ChallengeTranslationPage";
+import SentenceTranslationChallengePage from "./pages/SentenceTranslationChallengePage";
 import VictoryScreen from "./pages/VictoryScreen";
 import ReviewPage from "./pages/ReviewPage";
 import NotFound from "./pages/NotFound";
@@ -56,6 +58,7 @@ const App = () => {
               <Route path="/quiz/:lessonId" element={<QuizPage />} />
               <Route path="/challenge/:lessonId" element={<ChallengeQuizPage />} />
               <Route path="/challenge-translation/:lessonId" element={<ChallengeTranslationPage />} />
+              <Route path="/sentence-translation/:lessonId" element={<SentenceTranslationChallengePage />} />
               <Route path="/victory/:lessonId" element={<VictoryScreen />} />
               <Route path="/review" element={<ReviewPage />} />
               <Route path="*" element={<NotFound />} />

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, BookOpen, HelpCircle, MessageSquare } from 'lucide-react';
+import { ArrowLeft, BookOpen, HelpCircle, MessageSquare, Type } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useUser } from '@/contexts/UserContext';
 import XPBar from '@/components/XPBar';
@@ -36,6 +36,9 @@ const SubLessonDetailPage = () => {
   }
   
   const isCompleted = userState.completedLessons.includes(lesson.id);
+  
+  // Check if the lesson has sentence translation challenges
+  const hasSentenceTranslation = lesson.challenges.some(c => c.type === 'sentence-translation');
   
   return (
     <div className="min-h-screen py-6 px-4 bg-quran-background">
@@ -103,6 +106,20 @@ const SubLessonDetailPage = () => {
               <div className="text-sm text-gray-500">Multiple choice challenges</div>
             </div>
           </Button>
+          
+          {hasSentenceTranslation && (
+            <Button 
+              variant="outline" 
+              className="w-full py-6 px-4 justify-start gap-3 text-lg"
+              onClick={() => navigate(`/sentence-translation/${lessonId}`)}
+            >
+              <Type className="w-6 h-6 text-[#9b87f5]" />
+              <div className="text-left">
+                <div className="font-bold">Sentence Builder</div>
+                <div className="text-sm text-gray-500">Translate sentences with word tiles</div>
+              </div>
+            </Button>
+          )}
         </div>
         
         <div className="bg-muted rounded-lg p-4">
