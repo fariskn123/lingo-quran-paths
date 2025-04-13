@@ -1,4 +1,3 @@
-
 export interface Word {
   id: string;
   arabic: string;
@@ -8,6 +7,9 @@ export interface Word {
     arabic: string;
     translation: string;
   };
+  notes?: string;
+  morphology?: string;
+  root?: string;
 }
 
 export interface Lesson {
@@ -17,19 +19,23 @@ export interface Lesson {
   xpReward: number;
   words: Word[];
   challenges: Challenge[];
+  practicePhrase?: string;
+  culturalNote?: string;
 }
 
 export interface Challenge {
   id: string;
-  type: 'multiple-choice' | 'sentence-translation';
+  type: 'multiple-choice' | 'sentence-translation' | 'fill-in-blank' | 'audio-recognition';
   question: string;
   options?: string[];
   correctAnswer: string;
+  explanation?: string;
   sentence?: {
     arabic: string;
     translation: string;
     words: string[];
   };
+  audioUrl?: string;
 }
 
 export interface Level {
@@ -40,6 +46,11 @@ export interface Level {
   color: string;
   xpRequired: number;
   lessons: Lesson[];
+  thematicVerse?: {
+    arabic: string;
+    translation: string;
+    reference: string;
+  };
 }
 
 const levelsData: Level[] = [
@@ -50,18 +61,27 @@ const levelsData: Level[] = [
     emoji: '🟢',
     color: 'level-1',
     xpRequired: 0,
+    thematicVerse: {
+      arabic: 'بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيمِ',
+      translation: 'In the name of Allah, the Most Gracious, the Most Merciful',
+      reference: 'Opening of most chapters of the Quran'
+    },
     lessons: [
       {
         id: 'lesson-1-1',
         title: 'Divine Names',
         description: 'Learn the most powerful words in the Qur\'an',
         xpReward: 20,
+        practicePhrase: 'بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيمِ',
+        culturalNote: 'Muslims begin almost every action with Bismillah, invoking God\'s name.',
         words: [
           {
             id: 'word-1-1-1',
             arabic: 'اللّٰه',
             transliteration: 'Allāh',
             meaning: 'God',
+            root: 'أ ل ه',
+            notes: 'The proper name of God in Islam, referring to the One true deity.',
             example: {
               arabic: 'بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيمِ',
               translation: 'In the name of Allah, the Most Gracious, the Most Merciful'
@@ -72,6 +92,8 @@ const levelsData: Level[] = [
             arabic: 'رَحْمَة',
             transliteration: 'Raḥmah',
             meaning: 'Mercy',
+            root: 'ر ح م',
+            notes: 'Connotes tenderness, compassion, and forgiveness.',
             example: {
               arabic: 'وَمَا أَرْسَلْنَاكَ إِلَّا رَحْمَةً لِلْعَالَمِينَ',
               translation: 'And We have not sent you except as a mercy to the worlds'
@@ -82,9 +104,35 @@ const levelsData: Level[] = [
             arabic: 'نُور',
             transliteration: 'Nūr',
             meaning: 'Light',
+            root: 'ن و ر',
+            notes: 'In Islamic spirituality, light symbolizes divine guidance and illumination.',
             example: {
               arabic: 'اللَّهُ نُورُ السَّمَاوَاتِ وَالْأَرْضِ',
               translation: 'Allah is the Light of the heavens and the earth'
+            }
+          },
+          {
+            id: 'word-1-1-4',
+            arabic: 'هُدَى',
+            transliteration: 'Hudā',
+            meaning: 'Guidance',
+            root: 'هـ د ي',
+            notes: 'Refers to divine guidance that leads to the right path.',
+            example: {
+              arabic: 'ذَٰلِكَ الْكِتَابُ لَا رَيْبَ فِيهِ هُدًى لِلْمُتَّقِينَ',
+              translation: 'This is the Book, there is no doubt in it, a guidance for the God-conscious'
+            }
+          },
+          {
+            id: 'word-1-1-5',
+            arabic: 'بَرَكَة',
+            transliteration: 'Barakah',
+            meaning: 'Blessing',
+            root: 'ب ر ك',
+            notes: 'Refers to divine favor that brings increase, prosperity and happiness.',
+            example: {
+              arabic: 'وَجَعَلَنِي مُبَارَكًا أَيْنَ مَا كُنْتُ',
+              translation: 'And He has made me blessed wherever I am'
             }
           }
         ],
@@ -94,7 +142,8 @@ const levelsData: Level[] = [
             type: 'multiple-choice',
             question: 'What does اللّٰه mean?',
             options: ['God', 'Light', 'Mercy', 'Prophet'],
-            correctAnswer: 'God'
+            correctAnswer: 'God',
+            explanation: 'Allah (اللّٰه) is the Arabic word for God, the one and only deity in Islam.'
           },
           {
             id: 'challenge-1-1-2',
@@ -106,6 +155,22 @@ const levelsData: Level[] = [
               translation: 'In the name of Allah',
               words: ['In', 'the name', 'of', 'Allah']
             }
+          },
+          {
+            id: 'challenge-1-1-3',
+            type: 'fill-in-blank',
+            question: 'Allah is the _____ of the heavens and the earth.',
+            options: ['Light', 'Creator', 'Mercy', 'King'],
+            correctAnswer: 'Light',
+            explanation: 'This refers to the verse "Allah is the Light of the heavens and the earth" (24:35)'
+          },
+          {
+            id: 'challenge-1-1-4',
+            type: 'multiple-choice',
+            question: 'Which word means "blessing" in Arabic?',
+            options: ['بَرَكَة', 'نُور', 'رَحْمَة', 'هُدَى'],
+            correctAnswer: 'بَرَكَة',
+            explanation: 'بَرَكَة (Barakah) means blessing or divine favor that brings increase.'
           }
         ]
       },
@@ -114,12 +179,16 @@ const levelsData: Level[] = [
         title: 'Spiritual Concepts',
         description: 'Learn words related to faith and spirituality',
         xpReward: 25,
+        practicePhrase: 'الْإِيمَانُ بِاللَّهِ وَالْيَوْمِ الْآخِرِ',
+        culturalNote: 'Faith (Iman) in Islam encompasses belief, speech, and action.',
         words: [
           {
             id: 'word-1-2-1',
             arabic: 'جَنّة',
             transliteration: 'Jannah',
             meaning: 'Paradise',
+            root: 'ج ن ن',
+            notes: 'Literally means "garden." In Islamic theology, it refers to the paradise of the afterlife.',
             example: {
               arabic: 'إِنَّ الْمُتَّقِينَ فِي جَنَّاتٍ وَنَهَرٍ',
               translation: 'Indeed, the righteous will be among gardens and rivers'
@@ -130,9 +199,35 @@ const levelsData: Level[] = [
             arabic: 'إيمان',
             transliteration: 'Īmān',
             meaning: 'Faith',
+            root: 'أ م ن',
+            notes: 'Encompasses belief in Allah, His angels, His books, His messengers, the Last Day, and divine decree.',
             example: {
               arabic: 'وَمَن يُؤْمِن بِاللَّهِ يَهْدِ قَلْبَهُ',
               translation: 'And whoever believes in Allah, He guides his heart'
+            }
+          },
+          {
+            id: 'word-1-2-3',
+            arabic: 'تَقْوَى',
+            transliteration: 'Taqwā',
+            meaning: 'God-consciousness',
+            root: 'و ق ي',
+            notes: 'Often translated as "fear of God" but better understood as heightened God-consciousness that influences one\'s actions.',
+            example: {
+              arabic: 'إِنَّ أَكْرَمَكُمْ عِندَ اللَّهِ أَتْقَاكُمْ',
+              translation: 'Indeed, the most noble of you in the sight of Allah is the most righteous of you'
+            }
+          },
+          {
+            id: 'word-1-2-4',
+            arabic: 'تَوْبَة',
+            transliteration: 'Tawbah',
+            meaning: 'Repentance',
+            root: 'ت و ب',
+            notes: 'The act of turning back to Allah after committing a sin, with sincere regret and intention to reform.',
+            example: {
+              arabic: 'تُوبُوا إِلَى اللَّهِ تَوْبَةً نَصُوحًا',
+              translation: 'Turn to Allah in sincere repentance'
             }
           }
         ],
@@ -142,7 +237,27 @@ const levelsData: Level[] = [
             type: 'multiple-choice',
             question: 'What does جَنّة mean?',
             options: ['Paradise', 'Faith', 'Light', 'Mercy'],
-            correctAnswer: 'Paradise'
+            correctAnswer: 'Paradise',
+            explanation: 'Jannah (جَنّة) literally means "garden" and refers to paradise in Islamic theology.'
+          },
+          {
+            id: 'challenge-1-2-2',
+            type: 'fill-in-blank',
+            question: 'The Arabic word for God-consciousness is _____.',
+            options: ['إيمان', 'تَقْوَى', 'تَوْبَة', 'جَنّة'],
+            correctAnswer: 'تَقْوَى',
+            explanation: 'Taqwa (تَقْوَى) means God-consciousness or righteousness.'
+          },
+          {
+            id: 'challenge-1-2-3',
+            type: 'sentence-translation',
+            question: 'Translate this phrase',
+            correctAnswer: 'Turn to Allah in repentance',
+            sentence: {
+              arabic: 'تُوبُوا إِلَى اللَّهِ',
+              translation: 'Turn to Allah in repentance',
+              words: ['Turn', 'to', 'Allah', 'in repentance']
+            }
           }
         ]
       }
