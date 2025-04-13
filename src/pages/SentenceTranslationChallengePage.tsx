@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Check, X, MessageSquare, VolumeUp } from 'lucide-react';
+import { ArrowLeft, Check, X, MessageSquare, Volume } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useUser } from '@/contexts/UserContext';
 import { useToast } from '@/hooks/use-toast';
@@ -14,7 +13,6 @@ const SentenceTranslationChallengePage = () => {
   const { userState, addXP, completeLesson } = useUser();
   const { toast } = useToast();
   
-  // Find the lesson data
   const level = levelsData.find(level => 
     level.lessons.some(lesson => lesson.id === lessonId)
   );
@@ -37,7 +35,6 @@ const SentenceTranslationChallengePage = () => {
     );
   }
   
-  // Filter for sentence translation challenges
   const challenges = lesson.challenges.filter(c => c.type === 'sentence-translation');
   
   const [currentChallengeIndex, setCurrentChallengeIndex] = useState(0);
@@ -46,17 +43,13 @@ const SentenceTranslationChallengePage = () => {
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [completed, setCompleted] = useState(false);
   
-  // Get current challenge
   const currentChallenge = challenges[currentChallengeIndex];
   const progress = ((currentChallengeIndex + 1) / challenges.length) * 100;
   
-  // Initialize available words
   useEffect(() => {
     if (currentChallenge && currentChallenge.sentence) {
-      // Get words from the current challenge
       const correctWords = [...currentChallenge.sentence.words];
       
-      // Add extra words to make it more challenging (4-5 extra words)
       const otherLessons = levelsData.flatMap(level => level.lessons)
         .filter(l => l.id !== lessonId);
       
@@ -74,7 +67,6 @@ const SentenceTranslationChallengePage = () => {
         }
       }
       
-      // Combine and shuffle all words
       const allWords = [...correctWords, ...extraWords];
       setAvailableWords(allWords.sort(() => 0.5 - Math.random()));
       setSelectedWords([]);
@@ -82,7 +74,6 @@ const SentenceTranslationChallengePage = () => {
     }
   }, [currentChallengeIndex, currentChallenge, lessonId]);
   
-  // Check if there are any sentence translation challenges
   if (challenges.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#1A1F2C] text-white">
@@ -101,14 +92,14 @@ const SentenceTranslationChallengePage = () => {
   }
   
   const handleSelectWord = (word: string, index: number) => {
-    if (isCorrect !== null) return; // Don't allow changes after submission
+    if (isCorrect !== null) return;
     
     setSelectedWords([...selectedWords, word]);
     setAvailableWords(availableWords.filter((_, i) => i !== index));
   };
   
   const handleRemoveWord = (index: number) => {
-    if (isCorrect !== null) return; // Don't allow changes after submission
+    if (isCorrect !== null) return;
     
     const word = selectedWords[index];
     setSelectedWords(selectedWords.filter((_, i) => i !== index));
@@ -123,13 +114,11 @@ const SentenceTranslationChallengePage = () => {
     
     setIsCorrect(isUserCorrect);
     
-    // Auto-advance after delay
     setTimeout(() => {
       if (currentChallengeIndex < challenges.length - 1) {
         setCurrentChallengeIndex(currentChallengeIndex + 1);
       } else {
         setCompleted(true);
-        // Mark lesson as complete and award XP
         completeLesson(lessonId);
         addXP(lesson.xpReward);
         
@@ -138,7 +127,6 @@ const SentenceTranslationChallengePage = () => {
           description: `You earned ${lesson.xpReward} XP!`,
         });
         
-        // Navigate to the victory screen
         navigate(`/victory/${lessonId}`);
       }
     }, 2500);
@@ -147,7 +135,6 @@ const SentenceTranslationChallengePage = () => {
   return (
     <div className="min-h-screen py-6 px-4 bg-[#1A1F2C] text-white">
       <div className="max-w-md mx-auto">
-        {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <button 
             className="flex items-center text-[#9b87f5] font-medium"
@@ -161,7 +148,6 @@ const SentenceTranslationChallengePage = () => {
           </div>
         </div>
         
-        {/* Progress bar */}
         <div className="w-full bg-[#2A2F3C] rounded-full h-2 mb-6">
           <motion.div
             initial={{ width: `${((currentChallengeIndex) / challenges.length) * 100}%` }}
@@ -173,7 +159,6 @@ const SentenceTranslationChallengePage = () => {
         
         {currentChallenge && currentChallenge.sentence && (
           <>
-            {/* Arabic sentence in speech bubble */}
             <div className="mb-8">
               <div className="relative">
                 <div className="absolute -left-3 top-1/2 transform -translate-y-1/2">
@@ -187,7 +172,7 @@ const SentenceTranslationChallengePage = () => {
                   <div className="flex justify-between items-center mb-2">
                     <h2 className="text-sm text-[#8E9196]">Translate this phrase:</h2>
                     <button className="p-2 rounded-full bg-[#2A2F3C] hover:bg-[#363C4A]">
-                      <VolumeUp className="w-5 h-5 text-[#9b87f5]" />
+                      <Volume className="w-5 h-5 text-[#9b87f5]" />
                     </button>
                   </div>
                   <div className="arabic-text text-2xl font-bold">
@@ -197,7 +182,6 @@ const SentenceTranslationChallengePage = () => {
               </div>
             </div>
             
-            {/* Selected words area */}
             <div className="bg-[#2A2F3C] border-2 border-dashed border-[#363C4A] rounded-xl p-4 min-h-16 mb-6">
               <motion.div className="flex flex-wrap gap-2">
                 {selectedWords.length === 0 ? (
@@ -221,7 +205,6 @@ const SentenceTranslationChallengePage = () => {
               </motion.div>
             </div>
             
-            {/* Available words */}
             <div className="flex flex-wrap gap-2 mb-8">
               <AnimatePresence>
                 {availableWords.map((word, index) => (
@@ -240,7 +223,6 @@ const SentenceTranslationChallengePage = () => {
               </AnimatePresence>
             </div>
             
-            {/* Feedback */}
             <AnimatePresence>
               {isCorrect !== null && (
                 <motion.div 
@@ -264,7 +246,6 @@ const SentenceTranslationChallengePage = () => {
               )}
             </AnimatePresence>
             
-            {/* Action buttons */}
             <div className="flex justify-end">
               <Button
                 className="bg-[#9b87f5] hover:bg-[#8a76e5] text-white px-8"
