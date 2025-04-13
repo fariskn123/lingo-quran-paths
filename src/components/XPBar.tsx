@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { useUser } from '@/contexts/UserContext';
-import { Progress } from '@/components/ui/progress';
 
 interface XPBarProps {
   showXP?: boolean;
@@ -24,10 +23,12 @@ const XPBar: React.FC<XPBarProps> = ({ showXP = true, className = '', xpToNextLe
           <span className="font-medium">{userState.xp % xpToNextLevel}/{xpToNextLevel}</span>
         </div>
       )}
-      <Progress 
-        value={progress} 
-        className="h-2 bg-gray-200"
-      />
+      <div className="xp-bar">
+        <div 
+          className="xp-progress animate-pulse-glow"
+          style={{ width: `${progress}%` }}
+        ></div>
+      </div>
     </div>
   );
 };

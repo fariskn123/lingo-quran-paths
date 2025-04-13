@@ -1,22 +1,15 @@
-
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, BookOpen, HelpCircle, MessageSquare, GitCompare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useUser } from '@/contexts/UserContext';
 import XPBar from '@/components/XPBar';
-import StreakCounter from '@/components/StreakCounter';
 import levelsData from '@/data/levelsData';
 
 const LessonPage = () => {
   const { lessonId } = useParams<{ lessonId: string }>();
   const navigate = useNavigate();
-  const { userState, checkAndUpdateStreak } = useUser();
-  
-  // Check streak when component mounts
-  React.useEffect(() => {
-    checkAndUpdateStreak();
-  }, [checkAndUpdateStreak]);
+  const { userState } = useUser();
   
   const level = levelsData.find(level => 
     level.lessons.some(lesson => lesson.id === lessonId)
@@ -61,14 +54,7 @@ const LessonPage = () => {
         <div className="mb-8">
           <h1 className="text-2xl font-bold mb-2">{lesson.title}</h1>
           <p className="text-gray-600 mb-4">{lesson.description}</p>
-          
-          <div className="bg-white rounded-lg p-4 shadow-sm mb-4">
-            <div className="flex justify-between items-center mb-2">
-              <h2 className="font-bold">Your Progress</h2>
-              <StreakCounter />
-            </div>
-            <XPBar />
-          </div>
+          <XPBar />
           
           {isCompleted && (
             <div className="bg-green-50 text-green-800 rounded-lg p-3 mt-4 text-sm">

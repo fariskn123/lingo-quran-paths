@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { useUser } from '@/contexts/UserContext';
-import { Flame, Trophy, ArrowRight, Brain } from 'lucide-react';
+import { Flame, Trophy, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import levelsData from '@/data/levelsData';
 import StreakCounter from '@/components/StreakCounter';
@@ -12,7 +12,7 @@ import StreakCounter from '@/components/StreakCounter';
 const VictoryScreen = () => {
   const { lessonId } = useParams<{ lessonId: string }>();
   const navigate = useNavigate();
-  const { userState, completeLesson, addXP } = useUser();
+  const { userState, completeLesson } = useUser();
   const [xpEarned, setXpEarned] = useState(0);
   
   // Find the lesson and its parent level
@@ -24,14 +24,9 @@ const VictoryScreen = () => {
   
   useEffect(() => {
     if (lesson && !userState.completedLessons.includes(lesson.id)) {
-      // Calculate XP reward (lesson's base reward + 10 per activity)
-      const activityXP = 10;
-      const totalXP = lesson.xpReward;
-      
       // Mark lesson as completed and add XP
       completeLesson(lesson.id);
-      addXP(totalXP);
-      setXpEarned(totalXP);
+      setXpEarned(lesson.xpReward);
       
       // Trigger confetti
       console.log('Showing victory confetti!');
@@ -46,7 +41,7 @@ const VictoryScreen = () => {
         confetti({
           particleCount: 50,
           angle: 60,
-          spread: a: 55,
+          spread: 55,
           origin: { x: 0.1 }
         });
       }, 200);
@@ -65,7 +60,7 @@ const VictoryScreen = () => {
     return () => {
       console.log('Cleaning up confetti');
     };
-  }, [lesson, completeLesson, addXP, userState.completedLessons]);
+  }, [lesson, completeLesson, userState.completedLessons]);
   
   const handleContinue = () => {
     if (level) {
@@ -135,7 +130,6 @@ const VictoryScreen = () => {
             transition={{ delay: 0.7, duration: 0.5 }}
           >
             <div className="flex items-center gap-2 bg-[#2D4153] px-4 py-2 rounded-full">
-              <Brain className="w-5 h-5 text-purple-400" />
               <span className="text-white/70">Total XP:</span>
               <span className="text-[#FFC800] font-bold">{userState.xp}</span>
             </div>
@@ -153,9 +147,7 @@ const VictoryScreen = () => {
           transition={{ delay: 0.9, duration: 0.5 }}
           className="mb-6"
         >
-          <div className="mb-4">
-            <StreakCounter className="flex justify-center items-center gap-2" />
-          </div>
+          <StreakCounter className="flex justify-center items-center gap-2 mb-4" />
           
           <p className="text-white/70 text-sm">
             Keep your streak going! Practice daily to advance further.
