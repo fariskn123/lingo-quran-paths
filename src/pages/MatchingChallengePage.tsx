@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -33,11 +32,8 @@ const MatchingChallengePage = () => {
   const [totalPairs, setTotalPairs] = useState(0);
   const [showXpAnimation, setShowXpAnimation] = useState(false);
   
-  // Find the current lesson
   const lesson = levelsData.flatMap(level => level.lessons).find(lesson => lesson.id === lessonId);
-  const unitId = levelsData.find(level => level.lessons.some(l => l.id === lessonId))?.id;
   
-  // Canvas reference for confetti
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
   useEffect(() => {
@@ -46,7 +42,6 @@ const MatchingChallengePage = () => {
       return;
     }
     
-    // Create matching pairs from lesson words
     const matchPairs = lesson.words.map(word => ({
       id: word.id,
       arabic: word.arabic,
@@ -57,7 +52,6 @@ const MatchingChallengePage = () => {
     setPairs(matchPairs);
     setTotalPairs(matchPairs.length);
     
-    // Shuffle the arrays for display
     const arabicItems = [...matchPairs].map(pair => ({ ...pair, selected: false }));
     const englishItems = [...matchPairs].map(pair => ({ ...pair, selected: false }));
     
@@ -65,7 +59,6 @@ const MatchingChallengePage = () => {
     setShuffledEnglish(shuffleArray(englishItems));
   }, [lesson, navigate]);
   
-  // Shuffle array helper function
   const shuffleArray = <T extends unknown>(array: T[]): T[] => {
     const newArray = [...array];
     for (let i = newArray.length - 1; i > 0; i--) {
@@ -75,7 +68,6 @@ const MatchingChallengePage = () => {
     return newArray;
   };
   
-  // Handle word selection
   const handleSelectArabic = (item: MatchPair & { selected: boolean }) => {
     if (item.isMatched || isCompleted) return;
     
@@ -84,7 +76,6 @@ const MatchingChallengePage = () => {
       prev.map(p => p.id === item.id ? { ...p, selected: true } : { ...p, selected: false })
     );
     
-    // Check for match if English is already selected
     if (selectedEnglish) {
       checkForMatch(item, selectedEnglish);
     }
@@ -98,23 +89,19 @@ const MatchingChallengePage = () => {
       prev.map(p => p.id === item.id ? { ...p, selected: true } : { ...p, selected: false })
     );
     
-    // Check for match if Arabic is already selected
     if (selectedArabic) {
       checkForMatch(selectedArabic, item);
     }
   };
   
-  // Check if selected words match
   const checkForMatch = (arabic: MatchPair, english: MatchPair) => {
     const isMatch = arabic.id === english.id;
     
     if (isMatch) {
-      // Update pairs as matched
       setPairs(prev => 
         prev.map(p => p.id === arabic.id ? { ...p, isMatched: true } : p)
       );
       
-      // Update shuffled arrays
       setShuffledArabic(prev => 
         prev.map(p => p.id === arabic.id ? { ...p, isMatched: true, selected: false } : { ...p, selected: false })
       );
@@ -123,23 +110,19 @@ const MatchingChallengePage = () => {
         prev.map(p => p.id === english.id ? { ...p, isMatched: true, selected: false } : { ...p, selected: false })
       );
       
-      // Increment score
       setScore(prev => prev + 1);
       
-      // Play success sound or animation
       toast({
         title: "Correct!",
         description: `${arabic.arabic} = ${english.english}`,
         variant: "default",
       });
     } else {
-      // Reset selections after a brief delay to show the incorrect match
       setTimeout(() => {
         setShuffledArabic(prev => prev.map(p => ({ ...p, selected: false })));
         setShuffledEnglish(prev => prev.map(p => ({ ...p, selected: false })));
       }, 1000);
       
-      // Play error sound or animation
       toast({
         title: "Try again",
         description: "These words don't match",
@@ -147,11 +130,9 @@ const MatchingChallengePage = () => {
       });
     }
     
-    // Reset selections
     setSelectedArabic(null);
     setSelectedEnglish(null);
     
-    // Check if all pairs are matched
     setTimeout(() => {
       const allMatched = pairs.every(p => p.isMatched) || score + 1 === totalPairs;
       if (allMatched && totalPairs > 0) {
@@ -160,22 +141,18 @@ const MatchingChallengePage = () => {
     }, 300);
   };
   
-  // Handle challenge completion
   const handleCompletion = (finalMatchCorrect: boolean) => {
     setIsCompleted(true);
     setIsCorrect(score === totalPairs);
     
-    // Add XP and mark lesson as completed
     const xpEarned = lesson?.xpReward || 10;
     addXP(xpEarned);
     if (!userState.completedLessons.includes(lessonId || '')) {
       completeLesson(lessonId || '');
     }
     
-    // Show XP animation
     setShowXpAnimation(true);
     
-    // Launch confetti for correct answers
     if (finalMatchCorrect) {
       setTimeout(() => {
         if (canvasRef.current) {
@@ -194,13 +171,8 @@ const MatchingChallengePage = () => {
     }
   };
   
-  // Continue to next lesson or return to path
   const handleContinue = () => {
-    if (unitId) {
-      navigate(`/path/${unitId}`);
-    } else {
-      navigate('/levels');
-    }
+    navigate(`/victory/${lessonId}`);
   };
   
   if (!lesson) {
@@ -216,7 +188,6 @@ const MatchingChallengePage = () => {
     <div className="min-h-screen bg-[#131F2B] text-white pb-20">
       <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-50" />
       
-      {/* Header */}
       <div className="sticky top-0 bg-[#1C2A3B] p-4 flex justify-between items-center z-10">
         <button 
           onClick={() => navigate(-1)}
@@ -230,13 +201,10 @@ const MatchingChallengePage = () => {
         </div>
       </div>
       
-      {/* Challenge Content */}
       <div className="p-4 max-w-md mx-auto">
         <h2 className="text-xl font-bold mb-6 text-center">Match the pairs</h2>
         
-        {/* Game Board */}
         <div className="flex flex-col md:flex-row gap-6 mb-12">
-          {/* Arabic Column */}
           <div className="flex-1 space-y-3">
             {shuffledArabic.map((item) => (
               <motion.div
@@ -259,7 +227,6 @@ const MatchingChallengePage = () => {
             ))}
           </div>
           
-          {/* English Column */}
           <div className="flex-1 space-y-3">
             {shuffledEnglish.map((item) => (
               <motion.div
@@ -283,7 +250,6 @@ const MatchingChallengePage = () => {
           </div>
         </div>
         
-        {/* Completion Feedback */}
         <AnimatePresence>
           {isCompleted && (
             <motion.div
@@ -321,7 +287,6 @@ const MatchingChallengePage = () => {
           )}
         </AnimatePresence>
         
-        {/* XP Animation */}
         <AnimatePresence>
           {showXpAnimation && (
             <motion.div
