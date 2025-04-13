@@ -1,15 +1,17 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Book, HelpCircle, MessageSquare, RefreshCw, CheckCircle, Lock } from 'lucide-react';
+import { ArrowLeft, Book, HelpCircle, MessageSquare, RefreshCw, CheckCircle, Lock, Brain } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
 import XPBar from '@/components/XPBar';
+import StreakCounter from '@/components/StreakCounter';
 import levelsData, { Level, Lesson } from '@/data/levelsData';
 
 const SubLessonPathPage = () => {
   const { unitId } = useParams<{ unitId: string }>();
   const navigate = useNavigate();
-  const { userState } = useUser();
+  const { userState, checkAndUpdateStreak } = useUser();
   const [level, setLevel] = useState<Level | null>(null);
 
   useEffect(() => {
@@ -17,7 +19,10 @@ const SubLessonPathPage = () => {
     if (foundLevel) {
       setLevel(foundLevel);
     }
-  }, [unitId]);
+    
+    // Update streak when page loads
+    checkAndUpdateStreak();
+  }, [unitId, checkAndUpdateStreak]);
 
   if (!level) {
     return (
@@ -58,13 +63,28 @@ const SubLessonPathPage = () => {
           </div>
         </div>
         
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold mb-2">{level.name}</h1>
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold mb-1">{level.name}</h1>
           <p className="text-gray-600 mb-4">{level.description}</p>
-          <XPBar />
+          
+          <div className="bg-white rounded-lg p-4 shadow-sm mb-4">
+            <div className="flex justify-between items-center mb-2">
+              <h2 className="font-bold flex items-center gap-2">
+                <Brain className="w-5 h-5 text-purple-500" />
+                Your Progress
+              </h2>
+              <StreakCounter />
+            </div>
+            <XPBar />
+            <p className="text-xs text-gray-500 mt-2">
+              Complete activities to earn XP and unlock new lessons
+            </p>
+          </div>
         </div>
         
         <div className="relative pb-20">
+          <h2 className="text-xl font-bold mb-4">Lessons</h2>
+          
           {level.lessons.map((lesson, index) => {
             const isCompleted = userState.completedLessons.includes(lesson.id);
             const isLocked = isLessonLocked(index);
