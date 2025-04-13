@@ -1,21 +1,22 @@
 
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, BookOpen, HelpCircle, MessageSquare, Puzzle } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { ArrowLeft, BookOpen, HelpCircle, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useUser } from '@/contexts/UserContext';
 import XPBar from '@/components/XPBar';
 import levelsData from '@/data/levelsData';
 
 const SubLessonDetailPage = () => {
-  const { unitId, lessonId } = useParams<{ unitId: string; lessonId: string }>();
+  const { lessonId, unitId } = useParams<{ lessonId: string; unitId: string }>();
   const navigate = useNavigate();
   const { userState } = useUser();
   
-  // Find the level and lesson data
-  const level = levelsData.find(level => level.id === unitId);
+  // Find the lesson and its parent level
+  const level = levelsData.find(level => 
+    level.id === unitId && level.lessons.some(lesson => lesson.id === lessonId)
+  );
+  
   const lesson = level?.lessons.find(lesson => lesson.id === lessonId);
   
   if (!lesson || !level) {
@@ -24,7 +25,8 @@ const SubLessonDetailPage = () => {
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Lesson not found</h1>
           <Button 
-            onClick={() => navigate('/')}
+            className="bg-quran-green text-white"
+            onClick={() => navigate('/path/' + unitId)}
           >
             Return to Path
           </Button>
@@ -35,39 +37,8 @@ const SubLessonDetailPage = () => {
   
   const isCompleted = userState.completedLessons.includes(lesson.id);
   
-  // Determine the activity type based on the lesson
-  const getActivityType = () => {
-    // In a real app, this would be determined by the lesson data
-    // For now, we'll just assume all lessons have these activities
-    return [
-      { 
-        type: 'flashcard', 
-        title: 'Flashcards', 
-        description: 'Learn new vocabulary',
-        icon: <BookOpen className="w-6 h-6 text-quran-green" />,
-        path: `/flashcards/${lessonId}`
-      },
-      { 
-        type: 'quiz', 
-        title: 'Quiz', 
-        description: 'Test your knowledge',
-        icon: <HelpCircle className="w-6 h-6 text-quran-gold" />,
-        path: `/quiz/${lessonId}`
-      },
-      { 
-        type: 'challenge', 
-        title: 'Translation Challenge', 
-        description: 'Practice sentences',
-        icon: <MessageSquare className="w-6 h-6 text-level-3" />,
-        path: `/challenge/${lessonId}`
-      }
-    ];
-  };
-  
-  const activities = getActivityType();
-  
   return (
-    <div className="min-h-screen py-6 px-4">
+    <div className="min-h-screen py-6 px-4 bg-quran-background">
       <div className="max-w-md mx-auto">
         <div className="flex justify-between items-center mb-6">
           <button 
@@ -82,12 +53,7 @@ const SubLessonDetailPage = () => {
           </div>
         </div>
         
-        <motion.div 
-          className="mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
+        <div className="mb-8">
           <h1 className="text-2xl font-bold mb-2">{lesson.title}</h1>
           <p className="text-gray-600 mb-4">{lesson.description}</p>
           <XPBar />
@@ -97,39 +63,46 @@ const SubLessonDetailPage = () => {
               You've completed this lesson! Review it anytime.
             </div>
           )}
-        </motion.div>
+        </div>
         
         <div className="space-y-4 mb-8">
           <h2 className="text-xl font-bold">Learning Activities</h2>
           
-          {activities.map((activity, index) => (
-            <motion.div
-              key={activity.type}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
-              <Card className="overflow-hidden">
-                <CardHeader className="pb-2">
-                  <div className="flex items-center">
-                    {activity.icon}
-                    <div className="ml-2">
-                      <CardTitle className="text-lg">{activity.title}</CardTitle>
-                      <CardDescription>{activity.description}</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardFooter className="pt-2">
-                  <Button 
-                    className="w-full"
-                    onClick={() => navigate(activity.path)}
-                  >
-                    Start
-                  </Button>
-                </CardFooter>
-              </Card>
-            </motion.div>
-          ))}
+          <Button 
+            variant="outline" 
+            className="w-full py-6 px-4 justify-start gap-3 text-lg"
+            onClick={() => navigate(`/flashcards/${lessonId}`)}
+          >
+            <BookOpen className="w-6 h-6 text-quran-green" />
+            <div className="text-left">
+              <div className="font-bold">Flashcards</div>
+              <div className="text-sm text-gray-500">Learn new vocabulary</div>
+            </div>
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            className="w-full py-6 px-4 justify-start gap-3 text-lg"
+            onClick={() => navigate(`/quiz/${lessonId}`)}
+          >
+            <HelpCircle className="w-6 h-6 text-quran-gold" />
+            <div className="text-left">
+              <div className="font-bold">Quiz</div>
+              <div className="text-sm text-gray-500">Test your knowledge</div>
+            </div>
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            className="w-full py-6 px-4 justify-start gap-3 text-lg"
+            onClick={() => navigate(`/challenge/${lessonId}`)}
+          >
+            <MessageSquare className="w-6 h-6 text-level-3" />
+            <div className="text-left">
+              <div className="font-bold">Challenge Quiz</div>
+              <div className="text-sm text-gray-500">Multiple choice challenges</div>
+            </div>
+          </Button>
         </div>
         
         <div className="bg-muted rounded-lg p-4">
