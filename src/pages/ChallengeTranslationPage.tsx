@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check, X } from 'lucide-react';
+import { ArrowLeft, Check, X, Volume } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useUser } from '@/contexts/UserContext';
 import { useToast } from '@/hooks/use-toast';
@@ -25,12 +26,12 @@ const ChallengeTranslationPage = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Lesson not found</h1>
-          <button 
-            className="btn-primary"
+          <Button 
+            className="bg-quran-green text-white"
             onClick={() => navigate('/levels')}
           >
             Return to Levels
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -68,7 +69,7 @@ const ChallengeTranslationPage = () => {
           <h1 className="text-2xl font-bold mb-4">No Translation Challenges</h1>
           <p className="mb-6">This lesson doesn't have any translation challenges yet.</p>
           <Button 
-            className="btn-primary"
+            className="bg-quran-green text-white"
             onClick={() => {
               // Even with no challenges, mark as complete
               completeLesson(lessonId);
@@ -176,8 +177,16 @@ const ChallengeTranslationPage = () => {
           <>
             <div className="card mb-6">
               <h2 className="text-lg mb-2">Translate this phrase:</h2>
-              <div className="arabic-text text-2xl font-bold">
-                {currentChallenge.sentence.arabic}
+              <div className="flex items-center mb-2">
+                <div className="arabic-text text-2xl font-bold">
+                  {currentChallenge.sentence.arabic}
+                </div>
+                <button 
+                  className="ml-2 p-2 rounded-full hover:bg-gray-100"
+                  aria-label="Play pronunciation"
+                >
+                  <Volume className="w-5 h-5 text-quran-green" />
+                </button>
               </div>
             </div>
             
@@ -189,13 +198,17 @@ const ChallengeTranslationPage = () => {
                 </div>
               ) : (
                 selectedWords.map((word, index) => (
-                  <button
+                  <motion.button
                     key={index}
                     className="bg-quran-green text-white py-1 px-3 rounded-full"
                     onClick={() => handleRemoveWord(index)}
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.8, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
                   >
                     {word}
-                  </button>
+                  </motion.button>
                 ))
               )}
             </div>
@@ -203,20 +216,30 @@ const ChallengeTranslationPage = () => {
             {/* Available words */}
             <div className="flex flex-wrap gap-2 mb-8">
               {availableWords.map((word, index) => (
-                <button
+                <motion.button
                   key={index}
                   className="bg-gray-100 py-1 px-3 rounded-full"
                   onClick={() => handleSelectWord(word, index)}
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
                 >
                   {word}
-                </button>
+                </motion.button>
               ))}
             </div>
             
             {isCorrect !== null && (
-              <div className={`p-3 rounded-lg mb-4 ${
-                isCorrect ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
-              }`}>
+              <motion.div 
+                className={`p-3 rounded-lg mb-4 ${
+                  isCorrect ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+                }`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
                 {isCorrect 
                   ? <div className="flex items-center"><Check className="w-5 h-5 mr-2" /> Correct! Well done.</div>
                   : (
@@ -226,7 +249,7 @@ const ChallengeTranslationPage = () => {
                     </div>
                   )
                 }
-              </div>
+              </motion.div>
             )}
             
             <div className="flex justify-between">
