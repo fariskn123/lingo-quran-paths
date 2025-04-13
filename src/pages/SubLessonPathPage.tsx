@@ -1,74 +1,25 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Book, CheckCircle, Lock } from 'lucide-react';
+import { ArrowLeft, Book, HelpCircle, MessageSquare, RefreshCw, CheckCircle, Lock } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
 import XPBar from '@/components/XPBar';
-import StreakCounter from '@/components/StreakCounter';
 import levelsData, { Level, Lesson } from '@/data/levelsData';
-import { useLessonIndex } from '@/hooks/useLessonIndex';
 
 const SubLessonPathPage = () => {
   const { unitId } = useParams<{ unitId: string }>();
   const navigate = useNavigate();
   const { userState } = useUser();
   const [level, setLevel] = useState<Level | null>(null);
-  const { lessonIndex, isLoading: isLoadingIndex } = useLessonIndex();
-  const [dynamicLessons, setDynamicLessons] = useState<any[]>([]);
 
   useEffect(() => {
-    // First try to find level in static data
     const foundLevel = levelsData.find(level => level.id === unitId);
-    
     if (foundLevel) {
       setLevel(foundLevel);
-    } else if (unitId) {
-      // Create a placeholder level if not found in static data
-      setLevel({
-        id: unitId,
-        name: unitId.replace(/-/g, ' '),
-        emoji: '📚',
-        color: 'quran-green',
-        description: 'Learning path',
-        lessons: [],
-      });
     }
   }, [unitId]);
 
-  // Load dynamic lessons from the lesson index
-  useEffect(() => {
-    if (lessonIndex && unitId && lessonIndex[unitId]) {
-      setDynamicLessons(lessonIndex[unitId]);
-    }
-  }, [lessonIndex, unitId]);
-
-  // Combine static and dynamic lessons
-  const allLessons = level?.lessons.concat(
-    dynamicLessons.filter(dl => 
-      !level?.lessons.some(sl => sl.id === dl.lessonId)
-    ).map(dl => ({
-      id: dl.lessonId,
-      title: dl.title,
-      description: dl.description || 'Learn new vocabulary',
-      words: [], // Will be loaded when lesson is opened
-      challenges: [],
-      xpReward: 50,
-    } as Lesson))
-  ) || [];
-
-  if (isLoadingIndex) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin h-10 w-10 border-4 border-quran-green border-t-transparent rounded-full mx-auto mb-4"></div>
-          <h2 className="text-xl font-medium">Loading lessons...</h2>
-        </div>
-      </div>
-    );
-  }
-
-  if (!level && !isLoadingIndex) {
+  if (!level) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -87,7 +38,7 @@ const SubLessonPathPage = () => {
   const isLessonLocked = (lessonIndex: number) => {
     if (lessonIndex === 0) return false;
     
-    const prevLesson = allLessons[lessonIndex - 1];
+    const prevLesson = level.lessons[lessonIndex - 1];
     return prevLesson && !userState.completedLessons.includes(prevLesson.id);
   };
 
@@ -110,14 +61,11 @@ const SubLessonPathPage = () => {
         <div className="mb-8">
           <h1 className="text-2xl font-bold mb-2">{level.name}</h1>
           <p className="text-gray-600 mb-4">{level.description}</p>
-          <div className="flex justify-between items-center">
-            <XPBar />
-            <StreakCounter className="ml-4" />
-          </div>
+          <XPBar />
         </div>
         
         <div className="relative pb-20">
-          {allLessons.map((lesson, index) => {
+          {level.lessons.map((lesson, index) => {
             const isCompleted = userState.completedLessons.includes(lesson.id);
             const isLocked = isLessonLocked(index);
             
@@ -125,7 +73,7 @@ const SubLessonPathPage = () => {
             
             return (
               <div key={lesson.id} className="relative mb-14">
-                {index < allLessons.length - 1 && (
+                {index < level.lessons.length - 1 && (
                   <div className="absolute left-1/2 transform -translate-x-1/2 top-20 h-16 w-0.5 bg-gray-300 z-0"></div>
                 )}
                 

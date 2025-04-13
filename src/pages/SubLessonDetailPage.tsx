@@ -5,38 +5,21 @@ import { ArrowLeft, BookOpen, HelpCircle, MessageSquare, GitCompare } from 'luci
 import { Button } from '@/components/ui/button';
 import { useUser } from '@/contexts/UserContext';
 import XPBar from '@/components/XPBar';
-import StreakCounter from '@/components/StreakCounter';
-import { useLessonData } from '@/hooks/useLessonData';
 import levelsData from '@/data/levelsData';
 
 const SubLessonDetailPage = () => {
   const { lessonId, unitId } = useParams<{ lessonId: string; unitId: string }>();
   const navigate = useNavigate();
   const { userState } = useUser();
-  const { lessonData, isLoading, error } = useLessonData(unitId, lessonId);
   
-  // Find the lesson and its parent level from static data for backward compatibility
+  // Find the lesson and its parent level
   const level = levelsData.find(level => 
     level.id === unitId && level.lessons.some(lesson => lesson.id === lessonId)
   );
   
-  const staticLesson = level?.lessons.find(lesson => lesson.id === lessonId);
+  const lesson = level?.lessons.find(lesson => lesson.id === lessonId);
   
-  // Use dynamic data if available, fall back to static data
-  const lesson = lessonData || staticLesson;
-  
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin h-10 w-10 border-4 border-quran-green border-t-transparent rounded-full mx-auto mb-4"></div>
-          <h2 className="text-xl font-medium">Loading lesson...</h2>
-        </div>
-      </div>
-    );
-  }
-  
-  if (error || (!lesson && !level)) {
+  if (!lesson || !level) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -65,18 +48,15 @@ const SubLessonDetailPage = () => {
             <ArrowLeft className="w-5 h-5 mr-1" />
             Back
           </button>
-          <div className={`py-1 px-3 rounded-full text-white text-sm bg-${level?.color || 'quran-green'}`}>
-            {level?.emoji || '📚'} {level?.name || (unitId ? unitId.replace(/-/g, ' ') : '')}
+          <div className={`py-1 px-3 rounded-full text-white text-sm bg-${level.color}`}>
+            {level.emoji} {level.name}
           </div>
         </div>
         
         <div className="mb-8">
           <h1 className="text-2xl font-bold mb-2">{lesson.title}</h1>
           <p className="text-gray-600 mb-4">{lesson.description}</p>
-          <div className="flex justify-between items-center">
-            <XPBar />
-            <StreakCounter className="ml-4 flex items-center gap-1" />
-          </div>
+          <XPBar />
           
           {isCompleted && (
             <div className="bg-green-50 text-green-800 rounded-lg p-3 mt-4 text-sm">
@@ -152,7 +132,7 @@ const SubLessonDetailPage = () => {
         <div className="bg-muted rounded-lg p-4">
           <h3 className="font-bold mb-2">What You'll Learn</h3>
           <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
-            {lesson.words && lesson.words.map((word: any) => (
+            {lesson.words.map(word => (
               <li key={word.id}>{word.arabic} ({word.transliteration}) - {word.meaning}</li>
             ))}
           </ul>
