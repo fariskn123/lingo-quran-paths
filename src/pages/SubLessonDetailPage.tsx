@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, BookOpen, HelpCircle, MessageSquare, Grid2X2 } from 'lucide-react';
+import { ArrowLeft, BookOpen, HelpCircle, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useUser } from '@/contexts/UserContext';
 import XPBar from '@/components/XPBar';
@@ -113,18 +113,6 @@ const SubLessonDetailPage = () => {
             <div className="text-left">
               <div className="font-bold">Translation Builder</div>
               <div className="text-sm text-gray-500">Build English translations</div>
-            </div>
-          </Button>
-          
-          <Button 
-            variant="outline" 
-            className="w-full py-6 px-4 justify-start gap-3 text-lg"
-            onClick={() => navigate(`/matching-challenge/${lessonId}`)}
-          >
-            <Grid2X2 className="w-6 h-6 text-level-5" />
-            <div className="text-left">
-              <div className="font-bold">Matching Challenge</div>
-              <div className="text-sm text-gray-500">Match Arabic with English</div>
             </div>
           </Button>
         </div>
