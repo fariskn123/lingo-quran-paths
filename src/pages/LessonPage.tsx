@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, BookOpen, HelpCircle, MessageSquare, GitCompare } from 'lucide-react';
@@ -12,7 +11,6 @@ const LessonPage = () => {
   const navigate = useNavigate();
   const { userState } = useUser();
   
-  // Find the lesson and its parent level
   const level = levelsData.find(level => 
     level.lessons.some(lesson => lesson.id === lessonId)
   );
